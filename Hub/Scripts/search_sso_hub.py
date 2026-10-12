@@ -147,7 +147,7 @@ def pqs_lookup(sso):
 
 class App(tk.Tk):
     def __init__(self):
-        super().__init__();self.title("Search SSO - Dark Universe Reporting Hub");self.geometry("1220x820");self.minsize(1020,700);self.configure(bg="#F4F6F8")
+        super().__init__();self.title("Search SSO - Dark Universe Reporting Hub");self.geometry("900x620");self.minsize(900,620);self.configure(bg="#F4F6F8")
         self.sso=tk.StringVar();self.name=tk.StringVar(value="Search a Team Member");self.sub=tk.StringVar(value="Enter an SSO / Employee ID to view current training information.");self.sources=tk.StringVar(value="")
         self.build();self.bind("<Return>",lambda e:self.start());self.entry.focus_set()
     def build(self):
