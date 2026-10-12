@@ -46,6 +46,7 @@ echo Building the Reporting Hub EXE...
     --windowed ^
     --name "Dark Universe Reporting Hub" ^
     --paths "Scripts" ^
+    --hidden-import search_sso_hub ^
     "Scripts\reporting_hub.py"
 
 if errorlevel 1 (

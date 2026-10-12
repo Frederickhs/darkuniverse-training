@@ -45,34 +45,37 @@ def value(row,mapping,*names):
 def line_lookup(sso):
     path=newest(LINE_FOLDER); matches=[]
     if not path:return False,matches,"Unavailable"
-    day_names={"monday","tuesday","wednesday","thursday","friday","saturday","sunday","mon","tue","tues","wed","thu","thur","thurs","fri","sat","sun"}
+    day_aliases={"sun":"Sun","sunday":"Sun","mon":"Mon","monday":"Mon","tue":"Tue","tues":"Tue","tuesday":"Tue","wed":"Wed","wednesday":"Wed","thur":"Thur","thurs":"Thur","thu":"Thur","thursday":"Thur","fri":"Fri","friday":"Fri","sat":"Sat","saturday":"Sat"}
     wb=load_workbook(path,read_only=True,data_only=True)
     try:
         for ws in wb.worksheets:
             rows=list(ws.iter_rows(values_only=True))
-            for idx,row in enumerate(rows):
+            day_columns={}; field_columns={}
+            for header_index,row in enumerate(rows[:12]):
+                for column_index,raw in enumerate(row):
+                    header=norm(raw)
+                    if header in day_aliases:day_columns[column_index]=day_aliases[header]
+                    if header in {"technician","overstaff","overhire","id number","call sign"}:field_columns[column_index]=clean(raw)
+            for row in rows:
                 vals=[clean(v) for v in row]
                 if sso not in vals:continue
-                header=[]
-                for prior in range(max(0,idx-8),idx):
-                    candidate=[clean(v) for v in rows[prior]]
-                    if any(norm(v) in day_names for v in candidate) or any(norm(v) in {"sso","employee id","name","technician","position"} for v in candidate):
-                        header=candidate
-                labeled=[]; working=[]
-                for i,v in enumerate(vals):
-                    if not v:continue
-                    h=header[i] if i<len(header) else ""
-                    header_name = norm(h)
-                    if any(term in header_name for term in ("supervisor", "manager")):
-                        continue
-                    if h:
-                        labeled.append(f"{h}: {v}")
-                    elif v == sso:
-                        labeled.append(f"SSO: {v}")
-                    if h and header_name in day_names and norm(v) not in {"","off","no","n","0","false"}:
-                        working.append(h)
-                work_text=", ".join(working) if working else "See Line Schedule row"
-                matches.append({"shift":ws.title,"days":work_text,"details":" | ".join(labeled)})
+                working=[];off=[]
+                for column_index,day in day_columns.items():
+                    marker=norm(vals[column_index]) if column_index<len(vals) else ""
+                    if marker=="off":off.append(day)
+                    else:working.append(day)
+                details=[]
+                for column_index,label in field_columns.items():
+                    cell=vals[column_index] if column_index<len(vals) else ""
+                    if not cell:continue
+                    if norm(label) in {"supervisor","manager"}:continue
+                    details.append(f"{label}: {cell}")
+                if not any(sso in detail for detail in details):details.append(f"SSO: {sso}")
+                matches.append({
+                    "shift":ws.title,
+                    "days":", ".join(working) if working else "No working days detected",
+                    "details":" | ".join(details),
+                })
     finally:wb.close()
     return bool(matches),matches,path.name
 
@@ -145,9 +148,9 @@ def pqs_lookup(sso):
     finally:wb.close()
     return rows,sources
 
-class App(tk.Tk):
-    def __init__(self):
-        super().__init__();self.title("Search SSO - Dark Universe Reporting Hub");self.geometry("900x620");self.minsize(900,620);self.configure(bg="#F4F6F8")
+class App(tk.Toplevel):
+    def __init__(self, parent=None):
+        super().__init__(parent);self.title("Search SSO - Dark Universe Reporting Hub");self.geometry("1050x700");self.minsize(900,620);self.configure(bg="#F4F6F8")
         self.sso=tk.StringVar();self.name=tk.StringVar(value="Search a Team Member");self.sub=tk.StringVar(value="Enter an SSO / Employee ID to view current training information.");self.sources=tk.StringVar(value="")
         self.build();self.bind("<Return>",lambda e:self.start());self.entry.focus_set()
     def build(self):
@@ -205,4 +208,12 @@ class App(tk.Tk):
         self.btn.configure(state="normal");self.entry.focus_set()
     def fail(self,e):self.btn.configure(state="normal");self.banner.configure(text="Search failed.",bg=COLORS["red"]);messagebox.showerror("Search SSO",e)
 
-if __name__=="__main__":App().mainloop()
+def launch_search_sso(parent=None):
+    window = App(parent)
+    if parent is not None:
+        window.transient(parent)
+    window.focus_force()
+    return window
+
+if __name__=="__main__":
+    root=tk.Tk();root.withdraw();window=launch_search_sso(root);root.mainloop()

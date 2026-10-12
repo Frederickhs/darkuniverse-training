@@ -20,6 +20,7 @@ from log_manager import (
     log_report_start,
 )
 from report_runner import ReportResult, run_report
+from search_sso_hub import launch_search_sso
 
 
 APP_WIDTH = 840
@@ -224,10 +225,7 @@ class ReportingHubApp:
         search_sso_button = self.create_secondary_button(
             folder_button_frame,
             text="Search SSO",
-            command=lambda: subprocess.Popen([
-                sys.executable,
-                str(Path(__file__).resolve().parent / "search_sso_hub.py"),
-            ]),
+            command=lambda: launch_search_sso(self.root),
         )
         search_sso_button.grid(row=1, column=0, columnspan=3, padx=5, pady=(8, 4), sticky="ew")
         self.control_buttons.extend(
