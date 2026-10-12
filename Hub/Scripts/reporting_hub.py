@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -219,6 +221,15 @@ class ReportingHubApp:
         )
         log_button.grid(row=0, column=2, padx=5, pady=4)
 
+        search_sso_button = self.create_secondary_button(
+            folder_button_frame,
+            text="Search SSO",
+            command=lambda: subprocess.Popen([
+                sys.executable,
+                str(Path(__file__).resolve().parent / "search_sso_hub.py"),
+            ]),
+        )
+        search_sso_button.grid(row=1, column=0, columnspan=3, padx=5, pady=(8, 4), sticky="ew")
         self.control_buttons.extend(
             [input_button, output_button, log_button]
         )
