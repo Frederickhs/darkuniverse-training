@@ -1,0 +1,35 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# PyInstaller files
+build/
+dist/
+*.spec
+
+# Private runtime logs
+Logs/*
+!Logs/.gitkeep
+
+# Test and coverage files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# VS Code local settings
+.vscode/
+
+# Windows files
+Thumbs.db
+Desktop.ini
+
+# Excel temporary files
+~$*.xlsx
+~$*.xlsm
+
+# Environment and secrets
+.env
+.env.*

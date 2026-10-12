@@ -1,0 +1,15 @@
+{
+  "repository_root": "G:\\Dev\\darkuniverse-training",
+  "shared_inputs": {
+    "line_schedule_folder": "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Line Schedule",
+    "qualification_folder": "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Qualification",
+    "task_reports_folder": "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Tasks",
+    "sf_report_folder": "G:\\Dev\\darkuniverse-training\\Shared\\Input\\SF Report"
+  },
+  "reports": {
+    "pm_qualification_tracker": "G:\\Dev\\darkuniverse-training\\Reports\\PM Qualification Activity Tracker",
+    "qualification_coverage": "G:\\Dev\\darkuniverse-training\\Reports\\Qualification Coverage Report",
+    "pqs_dark_universe": "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report"
+  },
+  "hub_folder": "G:\\Dev\\darkuniverse-training\\Hub"
+}

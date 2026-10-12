@@ -1,0 +1,55 @@
+{
+    "hub":  {
+                "name":  "Dark Universe Reporting Hub",
+                "log_folder":  "Logs",
+                "continue_after_failure":  true,
+                "open_outputs_after_run":  false
+            },
+    "reports":  {
+                    "pm_qualification_tracker":  {
+                                                     "display_name":  "PM Qualification Activity Tracker",
+                                                     "project_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\PM Qualification Activity Tracker",
+                                                     "runner":  "G:\\Dev\\darkuniverse-training\\Reports\\PM Qualification Activity Tracker\\Run_Qualification_Tracker.bat",
+                                                     "output_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\PM Qualification Activity Tracker\\Output",
+                                                     "archive_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\PM Qualification Activity Tracker\\Archive",
+                                                     "input_folders":  {
+                                                                           "Qualification Reports":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Qualification",
+                                                                           "Task Reports":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Tasks",
+                                                                           "Animation Roster":  "G:\\Dev\\darkuniverse-training\\Reports\\PM Qualification Activity Tracker\\Input\\Manual roster",
+                                                                           "Line Schedule":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Line Schedule"
+                                                                       }
+                                                 },
+                    "qualification_coverage":  {
+                                                   "display_name":  "Qualification Coverage Report",
+                                                   "project_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\Qualification Coverage Report",
+                                                   "runner":  "G:\\Dev\\darkuniverse-training\\Reports\\Qualification Coverage Report\\Run Qualification Report.bat",
+                                                   "output_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\Qualification Coverage Report\\Output",
+                                                   "archive_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\Qualification Coverage Report\\Archive",
+                                                   "input_folders":  {
+                                                                         "Line Schedule":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Line Schedule",
+                                                                         "Qualification Reports":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Qualification"
+                                                                     }
+                                               },
+                    "pqs_dark_universe":  {
+                                              "display_name":  "PQS Dark Universe Report",
+                                              "project_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report",
+                                              "runner":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Run_PQS_Dark_Universe_Report.bat",
+                                              "output_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Output",
+                                              "archive_folder":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Archive",
+                                              "input_folders":  {
+                                                                    "Operations Maximo Reports":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Input\\Maximo\\Operations",
+                                                                    "Animation Maximo Reports":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Input\\Maximo\\Animation",
+                                                                    "Line Schedule":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Line Schedule",
+                                                                    "Qualification Reports":  "G:\\Dev\\darkuniverse-training\\Shared\\Input\\Qualification",
+                                                                    "Animation Roster":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Input\\Rosters",
+                                                                    "Supervisor Roster":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Input\\Supervisors",
+                                                                    "PQS Exceptions":  "G:\\Dev\\darkuniverse-training\\Reports\\PQS Dark Universe Report\\Input\\Exceptions"
+                                                                }
+                                          }
+                },
+    "run_order":  [
+                      "pm_qualification_tracker",
+                      "qualification_coverage",
+                      "pqs_dark_universe"
+                  ]
+}

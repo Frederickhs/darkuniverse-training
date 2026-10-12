@@ -1,0 +1,44 @@
+# Python
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Build output
+build/
+dist/
+*.spec
+
+# Excel temporary files
+~$*
+**/~$*
+
+# Shared private source data
+Shared/Input/Line Schedule/*
+!Shared/Input/Line Schedule/.gitkeep
+Shared/Input/Qualification/*
+!Shared/Input/Qualification/.gitkeep
+
+# Report private/runtime data
+**/Input/*
+**/Output/*
+**/Archive/*
+**/Logs/*
+**/Data/*
+
+# Preserve folder placeholders
+!**/Input/**/.gitkeep
+!**/Output/.gitkeep
+!**/Archive/.gitkeep
+!**/Logs/.gitkeep
+!**/Data/.gitkeep
+
+# Hub runtime logs
+Hub/Logs/*
+!Hub/Logs/.gitkeep
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
