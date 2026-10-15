@@ -10,6 +10,7 @@ ROOT = Path(r"G:\Dev\darkuniverse-training")
 LINE_FOLDER = ROOT / "Shared" / "Input" / "Line Schedule"
 SF_FOLDER = ROOT / "Shared" / "Input" / "SF Report"
 PQS_OUTPUT = ROOT / "Reports" / "PQS Dark Universe Report" / "Output"
+PQS_OPERATIONS = ROOT / "Reports" / "PQS Dark Universe Report" / "Input" / "Maximo" / "Operations"
 PM_OUTPUT = ROOT / "Reports" / "PM Qualification Activity Tracker" / "Output"
 DUE_SOON_DAYS = 15
 
@@ -125,28 +126,67 @@ def pm_lookup(sso):
         finally:wb.close()
     return results,sorted(set(sources))
 
-def pqs_lookup(sso):
-    rows=[];sources=[]
-    path=newest(PQS_OUTPUT)
-    if not path:return rows,sources
+def pqs_operations_lookup(sso):
+    rows=[]
+    path=newest(PQS_OPERATIONS)
+    if not path:return rows,""
     wb=load_workbook(path,read_only=True,data_only=True)
     try:
         for ws in wb.worksheets:
-            required={"sso":["SSO"],"name":["Name","Technician"],"position":["Position"],"venue":["Venue"],"shift":["Shift"]}
-            hr,m=find_header(ws,required)
-            if not hr or pick(m,"SSO") is None:continue
-            for row in ws.iter_rows(min_row=hr+1,values_only=True):
-                if value(row,m,"SSO")!=sso:continue
-                base={"sheet":ws.title,"position":value(row,m,"Position"),"venue":value(row,m,"Venue"),"shift":value(row,m,"Shift")}
-                for i,h in enumerate(ws.iter_rows(min_row=hr,max_row=hr,values_only=True).__next__()):
-                    title=clean(h)
-                    if title and ("MOD" in title.upper() or "STATUS" in title.upper() or "PROGRESS" in title.upper() or "REMAIN" in title.upper() or "REVIEW" in title.upper()):
-                        v=clean(row[i]) if i<len(row) else ""
-                        if v:rows.append((base["venue"],base["shift"],title,v,ws.title))
-                if not rows:rows.append((base["venue"],base["shift"],"Summary",base["position"],ws.title))
-        sources=[path.name] if rows else []
+            ws.reset_dimensions();header_row=0;header_map={}
+            for row_number,row in enumerate(ws.iter_rows(min_row=1,max_row=20,values_only=True),1):
+                mapping={norm(v):i for i,v in enumerate(row) if clean(v)}
+                if {"trainee","wo #","module","status"}.issubset(mapping):
+                    header_row=row_number;header_map=mapping;break
+            if not header_row:continue
+            trainee_col=header_map["trainee"];location_col=header_map.get("location");work_order_col=header_map["wo #"]
+            module_col=header_map["module"];status_col=header_map["status"];total_col=header_map.get("total tasks");completed_col=header_map.get("completed tasks")
+            current_sso="";current_location="";current_work_order=""
+            for row in ws.iter_rows(min_row=header_row+1,values_only=True):
+                trainee=clean(row[trainee_col]) if trainee_col<len(row) else ""
+                if trainee:
+                    current_sso=trainee
+                    current_location=clean(row[location_col]) if location_col is not None and location_col<len(row) else ""
+                    current_work_order=clean(row[work_order_col]) if work_order_col<len(row) else ""
+                if current_sso!=sso:continue
+                module=clean(row[module_col]) if module_col<len(row) else ""
+                status=clean(row[status_col]).upper() if status_col<len(row) else ""
+                if not module or status not in {"INPRG","COMP"}:continue
+                total=clean(row[total_col]) if total_col is not None and total_col<len(row) else ""
+                completed=clean(row[completed_col]) if completed_col is not None and completed_col<len(row) else ""
+                progress=f"{completed}/{total}" if completed or total else ""
+                rows.append((current_location,"",module,progress,status,current_work_order,path.name))
     finally:wb.close()
-    return rows,sources
+    return rows,path.name if rows else ""
+
+
+def pqs_lookup(sso):
+    rows=[];sources=[]
+    path=newest(PQS_OUTPUT)
+    if path:
+        wb=load_workbook(path,read_only=True,data_only=True)
+        try:
+            for ws in wb.worksheets:
+                required={"sso":["SSO"],"name":["Name","Technician"],"position":["Position"],"venue":["Venue"],"shift":["Shift"]}
+                hr,m=find_header(ws,required)
+                if not hr or pick(m,"SSO") is None:continue
+                headers=next(ws.iter_rows(min_row=hr,max_row=hr,values_only=True))
+                for row in ws.iter_rows(min_row=hr+1,values_only=True):
+                    if value(row,m,"SSO")!=sso:continue
+                    base={"sheet":ws.title,"position":value(row,m,"Position"),"venue":value(row,m,"Venue"),"shift":value(row,m,"Shift")}
+                    found=False
+                    for i,h in enumerate(headers):
+                        title=clean(h);upper=title.upper()
+                        if not title or not ("MOD" in upper or "STATUS" in upper or "PROGRESS" in upper or "REMAIN" in upper or "REVIEW" in upper):continue
+                        v=clean(row[i]) if i<len(row) else ""
+                        if v:rows.append((base["venue"],base["shift"],title,v,"","",ws.title));found=True
+                    if not found:rows.append((base["venue"],base["shift"],"Summary",base["position"],"","",ws.title))
+            if rows:sources.append(path.name)
+        finally:wb.close()
+    operation_rows,operation_source=pqs_operations_lookup(sso)
+    rows.extend(operation_rows)
+    if operation_source:sources.append(operation_source)
+    return rows,sorted(set(sources))
 
 class App(tk.Toplevel):
     def __init__(self, parent=None):
@@ -166,7 +206,7 @@ class App(tk.Toplevel):
         self.tabs=ttk.Notebook(body);self.tabs.pack(fill="both",expand=True)
         self.trees={}
         self.addtab("line","Profile & Line Schedule",("Shift / Sheet","Days Worked","Line Schedule Details"),(170,240,760))
-        self.addtab("pqs","PQS Modules",("Venue","Shift","Module / Field","Status / Progress","Source Sheet"),(150,130,220,350,180))
+        self.addtab("pqs","PQS Modules",("Venue","Shift","Module / Field","Result / Progress","Maximo Status","Work Order","Source"),(140,90,260,180,110,140,190))
         self.addtab("pm","PM Cycles",("Qualification","Cycle","Cycle Start","Due Date","PM Date","Days Remaining","Cycle Status","Task","Evidence"),(110,65,105,105,105,105,170,110,150))
         self.addtab("sf","SuccessFactors",("Item Title","Days Until Due","Status","Organization / Venue"),(520,120,110,300))
         tk.Label(body,textvariable=self.sources,font=("Segoe UI",8),bg="#F4F6F8",fg="#606A75",anchor="w").pack(fill="x",pady=(8,0))
