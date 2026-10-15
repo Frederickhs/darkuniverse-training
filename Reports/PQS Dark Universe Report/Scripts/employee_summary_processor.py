@@ -122,6 +122,10 @@ def summarize_venue(
         [result.work_order for result in module_results if result.work_order]
     )
 
+    if not work_orders and any(
+        result.result == "No Maximo Record" for result in module_results
+    ):
+        work_orders = ("Missing Maximo Data",)
     status = "COMPLETE" if not incomplete else "INCOMPLETE"
 
     return VenueSummary(

@@ -186,3 +186,10 @@ Includes:
 - Overall including Animation
 
 The No Maximo Record metric column appears only when at least one current result requires it.
+
+## Missing Maximo Display
+
+- When a current roster employee has no applicable Maximo records for unresolved modules, the applicable venue Work Order(s) field displays `Missing Maximo Data`.
+- The module status remains `No Maximo Record`.
+- The employee remains in the population sheet, dashboard totals, and employee action list.
+
