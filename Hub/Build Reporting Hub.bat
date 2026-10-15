@@ -47,6 +47,8 @@ echo Building the Reporting Hub EXE...
     --name "Dark Universe Reporting Hub" ^
     --paths "Scripts" ^
     --hidden-import search_sso_hub ^
+    --hidden-import pqs_pdf_generator ^
+    --add-data "PDF Templates;PDF Templates" ^
     "Scripts\reporting_hub.py"
 
 if errorlevel 1 (

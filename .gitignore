@@ -42,3 +42,10 @@ Hub/Logs/*
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Reporting Hub generated files
+*.pyc
+Hub/PDF Output/*
+!Hub/PDF Output/.gitkeep
+Hub/build/
+Hub/dist/
